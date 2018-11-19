@@ -42,7 +42,7 @@ class AccessForm():
 
    def check_input(self,event=''):
       '''
-      When called, verifies if the data provided in ent_usr and ent_psw are valid for a connection.
+      When called, verifies if the data provided in ent_usr and ent_psw are valid for the connection to MySQL.
       '''
       
       try:

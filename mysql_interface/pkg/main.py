@@ -10,7 +10,7 @@ class MysqlInterface():
    To execute the command, insert the statement into the entry-box and then press Return.
    The output will be shown in the scrolledtext at the bottom of the window.
 
-   By pressing Up or Down in the entry-box the interface will show up, repectively, the previous and the sequent command already committed.
+   By pressing Up or Down in the entry-box the interface will show up, repectively, the previous and the preceding committed command.
    '''
 
    def __init__(self,connection):
@@ -46,8 +46,8 @@ class MysqlInterface():
 
    def _execute(self,event=''):
       '''
-      If the result from self.commandhandler is None (i.e., an error occurred in the execution of the query) breaks the process.
-      Else, it collects the result from the query with the name of each column, if present.
+      If the result from self.commandhandler is None (i.e., an error occurred in the execution of the query) breaks the process and returns None.
+      Else, it collects the result from the query, adding the name for each column, if present.
    
       Finally, calls show_tables, which prints the output to the user.
       '''
@@ -56,6 +56,8 @@ class MysqlInterface():
 
       if not res: return
 
+      #The if statement tests if the name of the columns are presente in the response from the db and adds them to the result tuple.
+      #The name of the column are stored in the element 0 of each tuple in cursor.description.
       if self.cursor.description:
          result = (tuple(elm[0].upper() for elm in self.cursor.description),)
       else:
@@ -63,7 +65,39 @@ class MysqlInterface():
       result = result + self.cursor.fetchall()
       
       len_columns=length_col(result)
-      show_table(result,self.scr,len_columns)
+      self.show_table(result,self.scr,len_columns)
+      
+   def show_table(self,result,len_columns):
+      '''
+      As output, prints in self.scr a table, with every row separated by a '|'.
+      If there is no table to be returned, prints in self.scr only 'EXECUTED'.
+
+      The input accepted is compound by 2 nested iterables, where every cell is identified by input[row][col].
+
+
+      len_columns defines the maximum length for each column, in the form of an iterable of the type:
+      (len_col1, len_col2, len_col3, ...)
+      '''
+
+      table=str()
+
+      #Iterates through the rows
+      for row in range(len(result)):
+
+         #Iterates through the columns
+         for col in range(len(result[0])):
+
+            cell= '%'+ str(len_columns[col]) + 's|'
+            table += cell % str(result[row][col])
+
+         table += '\n'
+
+      self.scr.delete(1.0,tk.END)
+     
+      if table:
+         self.scr.insert(tk.INSERT,table.rstrip('\n'))
+      else:
+         self.scr.insert(tk.INSERT,'EXECUTED')
 
 
    def commandhandler(self):
@@ -89,6 +123,8 @@ class MysqlInterface():
 
    def recall_command(self,event=''):
       '''
+      The function is used to display to the user the privious or preceding commands typed in the interface.
+      
       According to the keywork pressed ('Up' or 'Down') recall_command updates the self.comm_index.
       Then shows to the user the recalled command in the scrolledtext.
       '''
@@ -111,48 +147,24 @@ class MysqlInterface():
 
 #######################################################################
 
-def length_col(l):
+def length_col(table):
    '''
-Funzione che riceve in entrata una lista o tuple dove ogni elemento rappresenta una riga
-e ogni elemento all'interno di questo una colonna.
-Consegna, in una lista ordinata, la lunghezza di caratteri massimi ritrovata per ogni colonna.
+   The function accepts as input a nested iterables as a table, where every cell is identified by input[row][col].
+   It returns an ordered list containing the maximum length for each column.
+   '''
 
-Es di variabile accettata: ((1,2,3),(a,b,c))
-In questo caso 1 sara' all'interno della prima riga, prima colonna;
-a, invece, sara' nella seconda riga, prima colonna.
-'''
-   if l:
-      out=list()
-     #prende in considerazione una colonna alla volta (il numero e' dato da n)
-      lenrow=len(l)
-      for n in range(len(l[0])):
-         #temp rappresenta una tupla contenente le lunghezze di tutti gli elementi in una data colonna
-         temp=(len(str(l[elm][n])) for elm in range(lenrow))
+   if table:
+      result=list()
+      len_row=len(table)
+
+      #selects one columns a time
+      for col in range(len(table[0])):
+
+         #column_lengths stores, as a generator, the length of every cell in the considered column.
+         column_lengths=(len(str(table[row][col])) for row in range(len_row))
          
-         #out sceglie solamente la massima
-         out.append(max(temp))
+         result.append(max(column_lengths))
    else:
-      out=[]
-   return out
+      result=[]
 
-#####################################################################################
-
-def show_table(out,scroll,lmax):
-   
-   temp=str()
-   for i in range(len(out)):
-      for n in range(len(out[0])):
-
-         str_temp= '%'+ str(lmax[n]) + 's|'
-         temp += str_temp % str(out[i][n])
-
-      temp += '\n'
-   scroll.delete(1.0,tk.END)
-
-   if temp:
-      scroll.insert(tk.INSERT,temp.rstrip('\n'))
-   else:
-      scroll.insert(tk.INSERT,'EXECUTED')
-
-#####################################################################################
-
+   return result

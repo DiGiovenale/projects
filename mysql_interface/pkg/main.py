@@ -65,7 +65,7 @@ class MysqlInterface():
       result = result + self.cursor.fetchall()
       
       len_columns=length_col(result)
-      self.show_table(result,self.scr,len_columns)
+      self.show_table(result,len_columns)
       
    def show_table(self,result,len_columns):
       '''

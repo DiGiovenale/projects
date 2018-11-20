@@ -1,5 +1,14 @@
-import tkinter as tk
-from tkinter import scrolledtext,messagebox
+#for 3.X
+try:
+   import tkinter as tk
+   from tkinter import scrolledtext, messagebox
+
+#for 2.X
+except:
+   import Tkinter as tk
+   import ScrolledText as scrolledtext
+   import tkMessageBox as messagebox
+   
 import pymysql
 
 

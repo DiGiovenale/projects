@@ -1,4 +1,4 @@
-#Inter-MySQL
+# Inter-MySQL #
 
 Inter-MySQL is GUI for MySQL.
 It consists in a simple interface and could be an easy alternative

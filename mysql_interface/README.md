@@ -10,9 +10,9 @@ To run a command, simply type it in the first entry-box and press Return.
 The result is shown in the scrollbox at the bottom of the window.
 
 To intstall Inter-MySQL simply download the whole directory.
-Be sure to have both pymysql and tkinter in your import-path.
+Be sure to have both pymysql and tkinter (or Tkinter) in your module search path.
 By running 'run.py', Inter-MySQL will be launched.
 
-For now the program is working only on Python 3.X.
+The program works on Python 3.X and 2.X.
 
 digiovenale
